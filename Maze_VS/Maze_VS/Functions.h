@@ -1,8 +1,8 @@
 #pragma once
-struct point;
-struct river_path;
-struct player;
-struct crocodile;
+#include <iostream>
+#include <string>
+#include "structs.h"
+using namespace std;
 
 extern bool command_changed;
 extern bool treasure_picked;

@@ -2,39 +2,14 @@
 #include <time.h>
 #include <locale.h>
 #include <iso646.h> // Чтобы можно было писать and и or
+#include "structs.h"
 using namespace std;
-struct point
-{
-    int i;
-    int j;
-};
-struct river_path
-{
-    point* river;
-    int count_of_r_around_summ = 0;
-    int count_river_along_bord = 0;
-    int* toched_walls = 0;
-    int numb_toched_walls = 0;
-};
-struct player
-{
-    string name;
-    int id;
-    point coord;
-    bool with_treasure = 0;
-    int hp = 2;
-    int bullets = 0;
-    int granade = 0;
-};
-struct crocodile
-{
-    bool alive = 1;
-    point coord;
-};
+
+
 
 extern bool command_changed = 0;
 extern bool treasure_picked = 0;
-extern point treasure;
+
 extern bool show_mase = 0;
 extern int turns_1 = 0;
 extern int turns_2 = 0;
@@ -53,8 +28,9 @@ extern bool sucsess_bum = 0;
 extern bool sucsess_add_swamp = 0;
 extern int trash = 0;
 extern int count_of_land = 0;
-extern string command;
-extern string action;
+extern string command = "";
+extern string action = "";
+
 
 extern point* complete_river = new point[30];
 extern point center_of_swamp;
@@ -64,6 +40,7 @@ extern point u_mouth;
 extern point pit1, pit2, pit3, bum1, bum2, bum3;
 extern player player_1;
 extern player player_2;
+extern point treasure;
 
 
 extern point* arr_of_land_points = new point[64];

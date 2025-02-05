@@ -3,7 +3,18 @@
 #include <locale.h>
 #include <iso646.h> // Чтобы можно было писать and и or
 #include "Functions.h"
+#include "structs.h"
 using namespace std;
+
+point center_of_swamp;
+point medbat;
+point arsenal;
+point u_mouth;
+point pit1, pit2, pit3, bum1, bum2, bum3;
+player player_1;
+player player_2;
+point treasure;
+char** lines;
 
 int main()
 {
@@ -25,7 +36,6 @@ int main()
     player_1.name = "Первый игрок";
     player_2.name = "Второй игрок";
 
-    char** lines;
     setlocale(0, "Russian");
     string key = "";
     /*cin >> key;
