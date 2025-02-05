@@ -5,6 +5,14 @@
     {
       "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|solutionrelative:Maze_VS\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Functions.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|solutionrelative:Maze_VS\\Functions.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Functions.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|solutionrelative:Maze_VS\\Functions.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,17 +22,51 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Functions.h",
+              "DocumentMoniker": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Functions.h",
+              "RelativeDocumentMoniker": "Maze_VS\\Functions.h",
+              "ToolTip": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Functions.h",
+              "RelativeToolTip": "Maze_VS\\Functions.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-05T14:47:19.252Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Functions.cpp",
+              "DocumentMoniker": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Functions.cpp",
+              "RelativeDocumentMoniker": "Maze_VS\\Functions.cpp",
+              "ToolTip": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Functions.cpp",
+              "RelativeToolTip": "Maze_VS\\Functions.cpp",
+              "ViewState": "AgIAAEoAAAAAAAAAAAAAAE0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-02-05T14:40:50.26Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
               "RelativeDocumentMoniker": "Maze_VS\\main.cpp",
-              "ToolTip": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
-              "RelativeToolTip": "Maze_VS\\main.cpp",
-              "ViewState": "AgIAABcFAAAAAAAAAAAAwDAFAAAAAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp*",
+              "RelativeToolTip": "Maze_VS\\main.cpp*",
+              "ViewState": "AgIAAEEAAAAAAAAAAAAAAE0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-02-04T08:59:56.878Z",
               "EditorCaption": ""
