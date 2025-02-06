@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\class_maze.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|solutionrelative:Maze_VS\\class_maze.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|solutionrelative:Maze_VS\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
@@ -27,12 +31,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "class_maze.cpp",
+              "DocumentMoniker": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\class_maze.cpp",
+              "RelativeDocumentMoniker": "Maze_VS\\class_maze.cpp",
+              "ToolTip": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\class_maze.cpp",
+              "RelativeToolTip": "Maze_VS\\class_maze.cpp",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAANoAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-02-06T19:15:20.266Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
               "RelativeDocumentMoniker": "Maze_VS\\main.cpp",
               "ToolTip": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
               "RelativeToolTip": "Maze_VS\\main.cpp",
-              "ViewState": "AgIAABEFAAAAAAAAAAAAwCAFAAAgAAAAAAAAAA==",
+              "ViewState": "AgIAADUEAAAAAAAAAIAwwEcEAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-02-04T08:59:56.878Z",
               "EditorCaption": ""
