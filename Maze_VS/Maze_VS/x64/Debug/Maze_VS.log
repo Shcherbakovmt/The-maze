@@ -3,4 +3,5 @@ C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp
 C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(372,9): warning C4101: next_river_point_index: неиспользованная локальная переменная
 C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(1225,10): warning C4101: temp_2: неиспользованная локальная переменная
 C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(1224,10): warning C4101: temp_1: неиспользованная локальная переменная
+  LINK : не найден или не выполнена сборка C:\Users\Пользователь\source\repos\The-maze\Maze_VS\x64\Debug\Maze_VS.exe при последней инкрементной компоновке; выполняется полная компоновка
   Maze_VS.vcxproj -> C:\Users\Пользователь\source\repos\The-maze\Maze_VS\x64\Debug\Maze_VS.exe
