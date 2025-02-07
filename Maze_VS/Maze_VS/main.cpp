@@ -2,7 +2,6 @@
 #include <time.h>
 #include <locale.h>
 #include <iso646.h> // Чтобы можно было писать and и or
-
 using namespace std;
 struct point
 {
@@ -30,10 +29,12 @@ struct player
 struct crocodile
 {
     bool alive = 1;
+    int time_to_res = 3;
     point coord;
 };
 
-
+static bool command_changed = 0;
+static bool treasure_picked = 0;
 static point treasure;
 static bool show_mase = 0;
 static int turns_1 = 0;
@@ -51,7 +52,8 @@ static int number_of_river = 22;
 static bool sucsess_river = 0;
 static bool sucsess_bum = 0;
 static bool sucsess_add_swamp = 0;
-
+static int trash = 0;
+static int count_of_land = 0;
 static string command;
 static string action;
 
@@ -65,7 +67,7 @@ static player player_1;
 static player player_2;
 
 
-
+static point* arr_of_land_points = new point[64];
 static char** lines;
 static river_path* paths = new river_path[2000000];
 static point* river = new point[number_of_river + 1];
@@ -73,7 +75,19 @@ static int count_of_path = 0;
 static long tries = 0;
 static long min_path_index = 0;
 
-
+bool player_in_exit(player* pl)
+{
+    if ((*pl).coord.i == 9 or (*pl).coord.i == 0 or (*pl).coord.j == 9 or (*pl).coord.j == 0)
+        return 1;
+    else
+        return 0;
+}
+int rand_from_a_to_b(int a, int b)
+{
+    seed = (seed * 73129 + 95121) % 10000;
+    srand(seed);
+    return rand() % (b - a + 1) + a;
+}
 
 void visual_lab(char** lines)
 {
@@ -87,16 +101,232 @@ void visual_lab(char** lines)
     }
 }
 
+char** init_arr(char** arr)
+{
+    arr = new char* [10];
 
+    for (int i = 0; i < 10; i++)
+    {
+        arr[i] = new char[10];
+    }
 
+    for (int i = 1; i < 9; i++)
+    {
+        for (int j = 1; j < 9; j++)
+        {
+            arr[i][j] = '.';
+        }
+    }
+    for (int n = 0; n < 10; n++)
+    {
+        arr[0][n] = 'w';
+        arr[n][0] = 'w';
+        arr[9][n] = 'w';
+        arr[n][9] = 'w';
+    }
+    return arr;
+}
 
+bool is_point_in_arr(point* arr, point p, int sise)
+{
+    for (int k = 0; k < sise; k++)
+    {
+        if (arr[k].i == p.i and arr[k].j == p.j)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+bool is_there_path(char** lines, point u_mouth)
+{
+    bool trig = 0;
 
+    if (u_mouth.j + 1 <= 8)
+    {
+        if (lines[u_mouth.i][u_mouth.j + 1] == '.') trig = 1;
+    }
+    if (u_mouth.j - 1 >= 1)
+    {
+        if (lines[u_mouth.i][u_mouth.j - 1] == '.') trig = 1;
+    }
+    if (u_mouth.i + 1 <= 8)
+    {
+        if (lines[u_mouth.i + 1][u_mouth.j] == '.') trig = 1;
+    }
+    if (u_mouth.i - 1 >= 1)
+    {
+        if (lines[u_mouth.i - 1][u_mouth.j] == '.') trig = 1;
+    }
+    return trig;
+}
 
+int is_along_border(char** lines, point p)
+{
+    if ((p.j + 1 > 8 and p.i - 1 < 1) or (p.j + 1 > 8 and p.i + 1 > 8) or (p.j - 1 < 1 and p.i - 1 < 1) or (p.j - 1 < 1 and p.i + 1 > 8)) return 10; // углы поля
 
+    if (p.j + 1 > 8) return 1; // справа стена
+    if (p.i - 1 < 1) return 2; // сверху
+    if (p.j - 1 < 1) return 3; // слева
+    if (p.i + 1 > 8) return 4; // снизу
+    return 0;
+}
 
+int count_of_swamp_around(char** lines, point p)
+{
 
+    int count_of_s = 0;
+    if (p.j + 1 <= 8)
+    {
+        if (lines[p.i][p.j + 1] == 's') count_of_s += 1; // справа
+    }
 
-//
+    if (p.i + 1 <= 8)
+    {
+        if (lines[p.i + 1][p.j] == 's') count_of_s += 1; // снизу
+    }
+
+    if (p.i - 1 >= 1)
+    {
+        if (lines[p.i - 1][p.j] == 's') count_of_s += 1; // сверху
+    }
+
+    if (p.j - 1 >= 1)
+    {
+        if (lines[p.i][p.j - 1] == 's') count_of_s += 1; // слева
+    }
+    return count_of_s;
+}
+int count_of_r_around(char** lines, point p)
+{
+
+    int count_of_r = 0;
+    if (p.j + 1 <= 8)
+    {
+        if (lines[p.i][p.j + 1] == 'r') count_of_r += 1; // справа
+    }
+
+    if (p.i + 1 <= 8)
+    {
+        if (lines[p.i + 1][p.j] == 'r') count_of_r += 1; // снизу
+    }
+
+    if (p.i - 1 >= 1)
+    {
+        if (lines[p.i - 1][p.j] == 'r') count_of_r += 1; // сверху
+    }
+
+    if (p.j - 1 >= 1)
+    {
+        if (lines[p.i][p.j - 1] == 'r') count_of_r += 1; // слева
+    }
+    return count_of_r;
+}
+
+int dist_quadr(point a, point b)
+{
+    return (b.i - a.i) * (b.i - a.i) + (b.j - a.j) * (b.j - a.j);
+}
+
+int number_of_land(char** lines, point* arr_of_p, int count_of_t)
+{
+    int count_of_possible;
+    //int next_point_index;
+
+    point* possible_points = new point[4]; // определение возможных клеток, куда дальше может течь река
+    count_of_possible = 0;
+
+    if (arr_of_p[count_of_t - 1].j + 1 <= 8)
+    {
+        if (lines[arr_of_p[count_of_t - 1].i][arr_of_p[count_of_t - 1].j + 1] == '.' or
+            lines[arr_of_p[count_of_t - 1].i][arr_of_p[count_of_t - 1].j + 1] == 'c')
+        {
+            possible_points[count_of_possible].i = arr_of_p[count_of_t - 1].i;
+            possible_points[count_of_possible].j = arr_of_p[count_of_t - 1].j + 1; // шаг вправо
+            count_of_possible += 1;
+        }
+    }
+    if (arr_of_p[count_of_t - 1].i + 1 <= 8)
+    {
+        if (lines[arr_of_p[count_of_t - 1].i + 1][arr_of_p[count_of_t - 1].j] == '.' or
+            lines[arr_of_p[count_of_t - 1].i + 1][arr_of_p[count_of_t - 1].j] == 'c')
+        {
+            possible_points[count_of_possible].i = arr_of_p[count_of_t - 1].i + 1; // шаг вниз
+            possible_points[count_of_possible].j = arr_of_p[count_of_t - 1].j;
+            count_of_possible += 1;
+        }
+    }
+    if (arr_of_p[count_of_t - 1].j - 1 >= 1)
+    {
+        if (lines[arr_of_p[count_of_t - 1].i][arr_of_p[count_of_t - 1].j - 1] == '.' or
+            lines[arr_of_p[count_of_t - 1].i][arr_of_p[count_of_t - 1].j - 1] == 'c') // шаг влево
+        {
+            possible_points[count_of_possible].i = arr_of_p[count_of_t - 1].i;
+            possible_points[count_of_possible].j = arr_of_p[count_of_t - 1].j - 1;
+            count_of_possible += 1;
+        }
+    }
+    if (arr_of_p[count_of_t - 1].i - 1 >= 1)
+    {
+        if (lines[arr_of_p[count_of_t - 1].i - 1][arr_of_p[count_of_t - 1].j] == '.' or
+            lines[arr_of_p[count_of_t - 1].i - 1][arr_of_p[count_of_t - 1].j] == 'c')
+        {
+            possible_points[count_of_possible].i = arr_of_p[count_of_t - 1].i - 1;
+            possible_points[count_of_possible].j = arr_of_p[count_of_t - 1].j; // шаг вверх
+            count_of_possible += 1;
+        }
+    }
+    if (count_of_possible == 0)
+    {
+        delete[] possible_points;
+        return 0;
+    }
+    for (int next_point_index = 0; next_point_index < count_of_possible; next_point_index++)
+    {
+        lines[possible_points[next_point_index].i][possible_points[next_point_index].j] = 't';
+        // visual_lab(lines); чтобы видеть как проверяется суша
+        if (not is_point_in_arr(arr_of_land_points, possible_points[next_point_index], 64))
+        {
+            count_of_land += 1;
+            arr_of_land_points[count_of_land - 1] = possible_points[next_point_index];
+        }
+        arr_of_p[count_of_t] = possible_points[next_point_index];
+        trash = number_of_land(lines, arr_of_p, count_of_t + 1);
+        lines[possible_points[next_point_index].i][possible_points[next_point_index].j] = '.';
+    }
+    delete[] possible_points;
+    return 0;
+
+}
+int number_of_land_complitely(char** lines)
+{
+    int maxx = 0;
+    for (int i = 1; i < 9; i++)
+    {
+        for (int j = 1; j < 9; j++)
+        {
+            if (lines[i][j] == '.' or lines[i][j] == 'c')
+            {
+                point* arr_of_p = new point[64];
+                int count_of_t = 1;
+                point p;
+                p.i = i;
+                p.j = j;
+                arr_of_p[0] = p;
+                count_of_land = 0;
+                for (int k = 0; k < 64; k++)
+                {
+                    arr_of_land_points[k].i = -1;
+                    arr_of_land_points[k].j = -1;
+                }
+                trash = number_of_land(lines, arr_of_p, count_of_t);
+                delete[] arr_of_p;
+                if (count_of_land > maxx) maxx = count_of_land;
+            }
+        }
+    }
+    return maxx;
+}
 
 bool create_river(char** lines, point* river, int count_of_river) // создание массива со всеми возможными путями и их характеристиками
 {
@@ -480,7 +710,7 @@ char** create_labirint()
     return lines;
 }
 
-bool shoot(char** lines, player* victim, player* hunter, string cmd)
+bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* croc)
 {
     if ((*hunter).bullets == 0)
     {
@@ -489,11 +719,11 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd)
     }
     (*hunter).bullets -= 1;
     cout << "У тебя осталось " << (*hunter).bullets << " патрона" << endl;
-    if (cmd == "Down")
+    if (cmd == "Down") // добавлен крокодил
     {
         for (int k = (*hunter).coord.i; k <= 9; k++)
         {
-            if (k == (*victim).coord.i and (*hunter).coord.j == (*victim).coord.j)
+            if (k == (*victim).coord.i and (*hunter).coord.j == (*victim).coord.j) // если попал в игрока
             {
                 (*victim).hp -= 1;
                 if ((*victim).hp == 0) death(lines, victim);
@@ -504,6 +734,13 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd)
                     treasure_picked = 0;
                     cout << "Игрок " << (*victim).name << " выронил клад" << endl;
                 }
+                return 1;
+            }
+            if (k == (*croc).coord.i and (*hunter).coord.j == (*croc).coord.j) // если попал в крокодила
+            {
+                (*croc).alive = 0;
+                (*croc).time_to_res = 3;
+                cout << "Убил крокодила" << endl;
                 return 1;
             }
         }
@@ -659,9 +896,9 @@ bool explode(char** lines, player* player, string cmd)
     return 1;
 }
 
-bool step(player* player, int turns, int* time_in_swamp, int id)
+bool step(player* player, int turns, int* time_in_swamp, int id, crocodile* croc)
 {
-    bool command_changed = 0;
+    command_changed = 0;
     if (player_in_exit(player) and turns != 0) // если человек находится "в выходе"
     {
         cout << "Игрок " << (*player).name << " заходит обратно в лабиринт" << endl;
@@ -802,12 +1039,12 @@ bool step(player* player, int turns, int* time_in_swamp, int id)
         cin >> command;
         if (id == 10) // Тогда охотник - первый игрок (И сейчас ход 1 игрока)
         {
-            trash = shoot(lines, &player_2, player, command);
+            trash = shoot(lines, &player_2, player, command, croc);
             return 1;
         }
         if (id == 20) // Тогда охотник - второй игрок (И сейчас ход 2 игрока)
         {
-            trash = shoot(lines, &player_1, player, command);
+            trash = shoot(lines, &player_1, player, command, croc);
             return 1;
         }
     }
@@ -996,7 +1233,6 @@ int main()
     char temp_2;
     char temp_3;
     action = "";
-    bool treasure_picked = 0;
 
     player_1.hp = 2;
     player_2.hp = 2;
@@ -1010,6 +1246,11 @@ int main()
     player_2.id = 20;
     player_1.name = "Первый игрок";
     player_2.name = "Второй игрок";
+    crocodile croc;
+    croc.coord.i = 1;
+    croc.coord.j = 1;
+    croc.alive = 1;
+    croc.time_to_res = 0;
 
     char** lines;
     setlocale(0, "Russian");
@@ -1062,19 +1303,19 @@ int main()
     while (command != "Stop" and command != "stop")
     {
         cout << "Ход первого игрока:" << endl;
-        trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id); // Ход 1 игрока
+        trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc); // Ход 1 игрока
         while (trash != 1)
         {
             cout << "Херню какую то ввел, давай нормальную команду" << endl;
-            trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id);
+            trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc);
         }
         cout << endl;
         cout << "Ход второго игрока:" << endl;
-        trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id); // Ход 2 игрока
+        trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc); // Ход 2 игрока
         while (trash != 1)
         {
             cout << "Херню какую то ввел, давай нормальную команду" << endl;
-            trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id);
+            trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc);
         }
         cout << endl;
 
