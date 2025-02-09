@@ -22,7 +22,7 @@ struct river_path
 struct player
 {
     string name;
-    int id;
+    int id = 0;
     point coord;
     bool with_treasure = 0;
     int hp = 2;
@@ -41,9 +41,9 @@ struct crocodile
 bool operator == (point a, point b) { return (a.i == b.i and a.j == b.j); }
 bool operator != (point a, point b) { return not(a.i == b.i and a.j == b.j); }
 
-static bool command_changed = 0;
-static bool treasure_picked = 0;
-static point treasure;
+
+
+
 static bool show_mase = 0;
 static int turns_1 = 0;
 static int turns_2 = 0;
@@ -74,10 +74,16 @@ static point pit1, pit2, pit3, bum1, bum2, bum3;
 struct elements
 {
     point center_of_swamp;
+    point treasure;
 };
 struct settings
 {
-    bool respawn_new_place;
+    bool respawn_new_place = 0;
+};
+struct technical
+{
+    bool command_changed = 0;
+    bool treasure_picked = 0;
 };
 
 
@@ -668,8 +674,9 @@ void create_land(char** lines)
 }
 
 
-void create_treasure(char** lines)
+point create_treasure(char** lines)
 {
+    point treas;
     int count_of_possible = 0;
     point* possible = new point[64];
     for (int i = 1; i < 9; i++)
@@ -686,10 +693,11 @@ void create_treasure(char** lines)
         }
     }
     int index = rand_from_a_to_b(0, count_of_possible - 1);
-    treasure = possible[index];
+    treas = possible[index];
     delete[] possible;
+    return treas;
 }
-void death(char** lines, player* player)
+void death(char** lines, player* player, technical* tech)
 {
     (*player).hp = 2;
 
@@ -697,7 +705,7 @@ void death(char** lines, player* player)
     (*player).bullets = 0;
     if ((*player).with_treasure == 1)
     {
-        treasure_picked = 0;
+        (*tech).treasure_picked = 0;
         cout << (*player).name << " выронил клад" << endl;
         (*player).with_treasure = 0;
         if (lines[(*player).coord.i][(*player).coord.j] == 's' or lines[(*player).coord.i][(*player).coord.j] == 'u')
@@ -767,7 +775,7 @@ char** create_labirint(elements* elem)
     return lines;
 }
 
-bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* croc)
+bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* croc, technical* tech)
 {
     if ((*hunter).bullets == 0)
     {
@@ -786,12 +794,12 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
                                                                         // т.е. если игрок и крокодил на одной клетке, первым получит пулю игрок
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim);
+                if ((*victim).hp == 0) death(lines, victim, tech);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
                     (*victim).with_treasure = 0;
-                    treasure_picked = 0;
+                    (*tech).treasure_picked = 0;
                     cout << "Игрок " << (*victim).name << " выронил клад" << endl;
                 }
                 return 1;
@@ -813,12 +821,12 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
             if (k == (*victim).coord.i and (*hunter).coord.j == (*victim).coord.j)
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim);
+                if ((*victim).hp == 0) death(lines, victim, tech);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
                     (*victim).with_treasure = 0;
-                    treasure_picked = 0;
+                    (*tech).treasure_picked = 0;
                     cout << "Игрок " << (*victim).name << " выронил клад" << endl;
                 }
                 return 1;
@@ -839,12 +847,12 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
             if (k == (*victim).coord.j and (*hunter).coord.i == (*victim).coord.i)
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim);
+                if ((*victim).hp == 0) death(lines, victim, tech);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
                     (*victim).with_treasure = 0;
-                    treasure_picked = 0;
+                    (*tech).treasure_picked = 0;
                     cout << "Игрок " << (*victim).name << " выронил клад" << endl;
                 }
                 return 1;
@@ -865,12 +873,12 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
             if (k == (*victim).coord.j and (*hunter).coord.i == (*victim).coord.i)
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim);
+                if ((*victim).hp == 0) death(lines, victim, tech);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
                     (*victim).with_treasure = 0;
-                    treasure_picked = 0;
+                    (*tech).treasure_picked = 0;
                     cout << "Игрок " << (*victim).name << " выронил клад" << endl;
                 }
                 return 1;
@@ -978,9 +986,9 @@ bool explode(char** lines, player* player, string cmd)
     return 1;
 }
 
-bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, player* pl1, player* pl2)
+bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, player* pl1, player* pl2, technical* tech, elements* elem)
 {
-    command_changed = 0;
+    (*tech).command_changed = 0;
     if (player_in_exit(pl) and turns != 0) // если человек находится "в выходе"
     {
         cout << "Игрок " << (*pl).name << " заходит обратно в лабиринт" << endl;
@@ -988,16 +996,16 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
         if ((*pl).coord.i == 0) command = "Down";
         if ((*pl).coord.j == 9) command = "Left"; // определяем куда надо шагнуть обратно
         if ((*pl).coord.j == 0) command = "Right";
-        command_changed = 1;
+        (*tech).command_changed = 1;
     }
-    if ((*pl).coord.i == treasure.i and (*pl).coord.j == treasure.j // на случай если сокровище заспавнилось прямо под игроком
+    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j // на случай если сокровище заспавнилось прямо под игроком
         and (*pl).with_treasure == 0 and (*pl).hp == 2)
     {
         cout << (*pl).name << " обнаружил под собой клад. Берешь его?" << endl;
         cin >> action;
         if (action == "Yes" or action == "y" or action == "Y") (*pl).with_treasure = 1;
     }
-    if ((*pl).coord.i == treasure.i and (*pl).coord.j == treasure.j
+    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j
         and (*pl).with_treasure == 0 and (*pl).hp != 2)
     {
         cout << (*pl).name << " обнаружил под собой клад но не может его взять т.к. не полное здоровье" << endl;
@@ -1064,19 +1072,19 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
 
         (*pl).coord.i += 1; // чтобы в нулевой ход игрок пришел на клетку, куда захотел высадиться
         command = "Up";
-        command_changed = 1;
+        (*tech).command_changed = 1;
     }
-    if (not(command_changed)) cin >> command; // P.s. command это static string обьявленный в самом начале P.s. так было раньше
+    if (not((*tech).command_changed)) cin >> command; // P.s. command это static string обьявленный в самом начале P.s. так было раньше
     if (command == "Show_maze")
     {
         show_mase = 1;
 
         temp_1 = lines[(*pl1).coord.i][(*pl1).coord.j];
         temp_2 = lines[(*pl2).coord.i][(*pl2).coord.j];
-        temp_3 = lines[treasure.i][treasure.j];
+        temp_3 = lines[(*elem).treasure.i][(*elem).treasure.j];
         temp_4 = lines[(*croc).coord.i][(*croc).coord.j];
         lines[(*pl1).coord.i][(*pl1).coord.j] = 'O'; // Нанести игрока на карту лабиринта временно (чтобы было видно где он)
-        lines[treasure.i][treasure.j] = 't';
+        lines[(*elem).treasure.i][(*elem).treasure.j] = 't';
         lines[(*pl2).coord.i][(*pl2).coord.j] = 'T';
         lines[(*croc).coord.i][(*croc).coord.j] = 'C';
         
@@ -1086,7 +1094,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
         // if(show_mase) visual_lab(lines);                  // Вывести лабиринт
         lines[(*pl1).coord.i][(*pl1).coord.j] = temp_1; // Вернуть в точку в лабиринте то что было
         lines[(*pl2).coord.i][(*pl2).coord.j] = temp_2;
-        lines[treasure.i][treasure.j] = temp_3;
+        lines[(*elem).treasure.i][(*elem).treasure.j] = temp_3;
         lines[(*croc).coord.i][(*croc).coord.j] = temp_4;
         cin >> command;
     }
@@ -1113,26 +1121,26 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
 
     if (command == "Left") (*pl).coord.j -= 1;
 
-    if ((*pl).coord.i == treasure.i and (*pl).coord.j == treasure.j and treasure_picked != 1 and (*pl).hp == 2) // если нашел клад
+    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j and (*tech).treasure_picked != 1 and (*pl).hp == 2) // если нашел клад
     {
         cout << (*pl).name << " нашел клад. Берешь его?" << endl;
         cin >> action;
         if (action == "Yes" or action == "y" or action == "Y")
         {
             (*pl).with_treasure = 1;
-            treasure_picked = 1;
+            (*tech).treasure_picked = 1;
         }
     }
 
-    if ((*pl).coord.i == treasure.i and (*pl).coord.j == treasure.j and treasure_picked != 1 and (*pl).hp < 2)
+    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j and (*tech).treasure_picked != 1 and (*pl).hp < 2)
     {
         cout << (*pl).name << " нашел клад но не может его взять" << endl;
     }
 
     if ((*pl).with_treasure)
     {
-        treasure.i = (*pl).coord.i;
-        treasure.j = (*pl).coord.j;
+        (*elem).treasure.i = (*pl).coord.i;
+        (*elem).treasure.j = (*pl).coord.j;
     }
     if (command == "Shoot")
     {
@@ -1140,7 +1148,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
         cin >> command;
         if (id == 10) // Тогда охотник - первый игрок (И сейчас ход 1 игрока)
         {
-            trash = shoot(lines, &(*pl2), pl, command, croc);
+            trash = shoot(lines, &(*pl2), pl, command, croc, tech);
             if ( (lines[(*pl).coord.i][(*pl).coord.j] == 's' or 
                   lines[(*pl).coord.i][(*pl).coord.j] == 'u')
                   and (*croc).alive)
@@ -1151,7 +1159,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
                 {
                     cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                     (*time_in_swamp) = 0;
-                    death(lines, pl);
+                    death(lines, pl, tech);
                     return 1;
                 }
             }
@@ -1160,7 +1168,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
         }
         if (id == 20) // Тогда охотник - второй игрок (И сейчас ход 2 игрока)
         {
-            trash = shoot(lines, &(*pl1), pl, command, croc);
+            trash = shoot(lines, &(*pl1), pl, command, croc, tech);
             if ((lines[(*pl).coord.i][(*pl).coord.j] == 's' or
                 lines[(*pl).coord.i][(*pl).coord.j] == 'u')
                 and (*croc).alive)
@@ -1171,7 +1179,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
                 {
                     cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                     (*time_in_swamp) = 0;
-                    death(lines, pl);
+                    death(lines, pl, tech);
                     return 1;
                 }
             }
@@ -1194,7 +1202,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             {
                 cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                 (*time_in_swamp) = 0;
-                death(lines, pl);
+                death(lines, pl, tech);
                 return 1;
             }
         }
@@ -1265,12 +1273,12 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             if ((*time_in_swamp) == 3)
             {
                 cout << "Покусан крокодилом, отправился в медсанбат" << endl;
-                death(lines, pl);
+                death(lines, pl, tech);
                 (*time_in_swamp) = 0;
                 return 1;
             }
         }
-        else 
+        else cout << "Крокодила нет, в болоте рычать некому" << endl;
         return 1;
     }
     if (lines[(*pl).coord.i][(*pl).coord.j] == 'M')
@@ -1312,14 +1320,22 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
     }
     if (lines[(*pl).coord.i][(*pl).coord.j] == 's')
     {
-        (*time_in_swamp) += 1;
-        cout << "Болото рычит " << (*time_in_swamp) << " раз" << endl;
-        if ((*time_in_swamp) == 3)
+        if ((*croc).alive)
         {
-            cout << "Покусан крокодилом, отправился в медсанбат" << endl;
-            death(lines, pl);
-            (*time_in_swamp) = 0;
-            return 1;
+            (*time_in_swamp) += 1;
+            cout << "Болото рычит " << (*time_in_swamp) << " раз" << endl;
+            if ((*time_in_swamp) == 3)
+            {
+                cout << "Покусан крокодилом, отправился в медсанбат" << endl;
+                death(lines, pl, tech);
+                (*time_in_swamp) = 0;
+                return 1;
+            }
+        }
+        else
+        {
+            cout << "Крокодила нет, в болоте рычать некому" << endl;
+
         }
         return 1;
     }
@@ -1335,8 +1351,8 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
 
         if ((*pl).with_treasure)
         {
-            treasure.i = (*pl).coord.i;
-            treasure.j = (*pl).coord.j;
+            (*elem).treasure.i = (*pl).coord.i;
+            (*elem).treasure.j = (*pl).coord.j;
         }
 
         if (lines[(*pl).coord.i][(*pl).coord.j] == 's' or lines[(*pl).coord.i][(*pl).coord.j] == 'u')
@@ -1347,7 +1363,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             {
                 cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                 (*time_in_swamp) = 0;
-                death(lines, pl);
+                death(lines, pl, tech);
                 return 1;
             }
 
@@ -1381,7 +1397,7 @@ int main()
 {
     elements elem;
     settings sett;
-    
+    technical tech;
     char temp_1;
     char temp_2;
     char temp_3;
@@ -1409,15 +1425,15 @@ int main()
     do
     {
         lines = create_labirint(&elem);
-        create_treasure(lines);
+        elem.treasure = create_treasure(lines);
         
         if (show_mase)
         {
-            temp_3 = lines[treasure.i][treasure.j];
-            lines[treasure.i][treasure.j] = 't';
+            temp_3 = lines[elem.treasure.i][elem.treasure.j];
+            lines[elem.treasure.i][elem.treasure.j] = 't';
             visual_lab(lines);
             cout << endl;
-            lines[treasure.i][treasure.j] = temp_3;
+            lines[elem.treasure.i][elem.treasure.j] = temp_3;
         }
         cout << "Устраивает лабиринт?" << endl;
         cin >> key;
@@ -1445,19 +1461,19 @@ int main()
             }
         }
         cout << "Ход первого игрока:" << endl;
-        trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc, &player_1, &player_2); // Ход 1 игрока
+        trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc, &player_1, &player_2, &tech, &elem); // Ход 1 игрока
         while (trash != 1)
         {
             cout << "Херню какую то ввел, давай нормальную команду" << endl;
-            trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc, &player_1, &player_2);
+            trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc, &player_1, &player_2, &tech, &elem);
         }
         cout << endl;
         cout << "Ход второго игрока:" << endl;
-        trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc, &player_1, &player_2); // Ход 2 игрока
+        trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc, &player_1, &player_2, &tech, &elem); // Ход 2 игрока
         while (trash != 1)
         {
             cout << "Херню какую то ввел, давай нормальную команду" << endl;
-            trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc, &player_1, &player_2);
+            trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc, &player_1, &player_2, &tech, &elem);
         }
         cout << endl;
 
