@@ -1,6 +1,6 @@
 ﻿  main.cpp
-C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(117,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(455,9): warning C4101: next_river_point_index: неиспользованная локальная переменная
-C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(1428,10): warning C4101: temp_2: неиспользованная локальная переменная
-C:\Users\Пользователь\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(1427,10): warning C4101: temp_1: неиспользованная локальная переменная
-  Maze_VS.vcxproj -> C:\Users\Пользователь\source\repos\The-maze\Maze_VS\x64\Debug\Maze_VS.exe
+C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(114,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(452,9): warning C4101: next_river_point_index: неиспользованная локальная переменная
+C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(1423,10): warning C4101: temp_2: неиспользованная локальная переменная
+C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(1422,10): warning C4101: temp_1: неиспользованная локальная переменная
+  Maze_VS.vcxproj -> C:\Users\User\source\repos\The-maze\Maze_VS\x64\Debug\Maze_VS.exe

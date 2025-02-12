@@ -45,11 +45,6 @@ bool operator != (point a, point b) { return not(a.i == b.i and a.j == b.j); }
 
 
 
-
-static point* complete_river = new point[64];
-
-static point pit1, pit2, pit3, bum1, bum2, bum3;
-
 class elements
 {
 public:
@@ -58,6 +53,8 @@ public:
     point medbat;
     point arsenal;
     point u_mouth;
+    point pit1, pit2, pit3, bum1, bum2, bum3; // по умолчанию два бума
+    point* complete_river = new point[64]; // финальная река
 };
 class settings
 {
@@ -72,14 +69,14 @@ public:
     int number_of_river;
     settings()
     {
-        respawn_new_place = 0;
-        k_along_bord = 1;
-        k_r_around = 2;
-        k_touch_walls = -4;
-        quadr_dist_between_pits = 7;
-        add_swamp_max = 4;
+        respawn_new_place = 0; // если == 1, то крокодил перерождается каждый раз в рандомном месте
+        k_along_bord = 1; // штраф за прилегание реки к стенам лабиринта
+        k_r_around = 2; // штраф за то что река слишком много контактирует сама с собой
+        k_touch_walls = -4; // поощрение за касание рекой одной из 4 стен лабиринта
+        quadr_dist_between_pits = 7; // квадрат минимального расстояния между ямами
+        add_swamp_max = 4; // диапозон добавочного болота
         add_swamp_min = 1;
-        number_of_river = 22;
+        number_of_river = 22; // количество рек
     }
     
 };
@@ -511,7 +508,7 @@ bool create_river(char** lines, point* river, int count_of_river, settings* sett
 
 }
 
-bool create_bum(char** lines, technical* tech)
+bool create_bum(char** lines, technical* tech, elements* elem)
 {
     point* possible = new point[64];
     int count_poss = 0;
@@ -527,26 +524,24 @@ bool create_bum(char** lines, technical* tech)
             }
         }
     }
-    point bum1;
-    point bum2;
     //point bum3;
     int repeat = 0;
     do
     {
         if (repeat != 0)
         {
-            lines[bum1.i][bum1.j] = '.';
-            lines[bum2.i][bum2.j] = '.';
-            //lines[bum3.i][bum3.j] = '.';
+            lines[elem->bum1.i][elem->bum1.j] = '.';
+            lines[elem->bum2.i][elem->bum2.j] = '.';
+            //lines[elem->bum3.i][elem->bum3.j] = '.';
         }
-        bum1 = possible[rand_from_a_to_b(0, count_poss - 1, tech)];
-        bum2 = possible[rand_from_a_to_b(0, count_poss - 1, tech)];
-        //bum3 = possible[rand_from_a_to_b(0,count_poss-1)];
-        while (bum2.i == bum1.i and bum2.j == bum1.j) bum2 = possible[rand_from_a_to_b(0, count_poss - 1, tech)]; // выбираю точку так, чтобы оба бума не попали в одну
-        //while((bum3.i == bum1.i and bum3.j == bum1.j) or (bum3.i == bum2.i and bum3.j == bum2.j)) bum3 = possible[rand_from_a_to_b(0,count_poss-1)]; // аналогично
-        lines[bum1.i][bum1.j] = 'b';
-        lines[bum2.i][bum2.j] = 'b';
-        //lines[bum3.i][bum3.j] = 'b';
+        elem->bum1 = possible[rand_from_a_to_b(0, count_poss - 1, tech)];
+        elem->bum2 = possible[rand_from_a_to_b(0, count_poss - 1, tech)];
+        //elem->bum3 = possible[rand_from_a_to_b(0,count_poss-1)];
+        while (elem->bum2.i == elem->bum1.i and elem->bum2.j == elem->bum1.j) elem->bum2 = possible[rand_from_a_to_b(0, count_poss - 1, tech)]; // выбираю точку так, чтобы оба бума не попали в одну
+        //while((elem->bum3.i == elem->bum1.i and elem->bum3.j == elem->bum1.j) or (elem->bum3.i == elem->bum2.i and elem->bum3.j == elem->bum2.j)) elem->bum3 = possible[rand_from_a_to_b(0,count_poss-1)]; // аналогично
+        lines[elem->bum1.i][elem->bum1.j] = 'b';
+        lines[elem->bum2.i][elem->bum2.j] = 'b';
+        //lines[elem->bum3.i][elem->bum3.j] = 'b';
         repeat += 1;
     } while (false);
 
@@ -557,23 +552,23 @@ void create_pits(char** lines, settings* sett, technical* tech, elements* elem)
 {
     do
     {
-        pit1.i = rand_from_a_to_b(1, 8, tech);
-        pit1.j = rand_from_a_to_b(1, 8, tech);
+        elem->pit1.i = rand_from_a_to_b(1, 8, tech);
+        elem->pit1.j = rand_from_a_to_b(1, 8, tech);
 
-        pit2.i = rand_from_a_to_b(1, 8, tech);
-        pit2.j = rand_from_a_to_b(1, 8, tech);
+        elem->pit2.i = rand_from_a_to_b(1, 8, tech);
+        elem->pit2.j = rand_from_a_to_b(1, 8, tech);
 
-        pit3.i = rand_from_a_to_b(1, 8, tech);
-        pit3.j = rand_from_a_to_b(1, 8, tech);
+        elem->pit3.i = rand_from_a_to_b(1, 8, tech);
+        elem->pit3.j = rand_from_a_to_b(1, 8, tech);
         //
-    } while (not (lines[pit1.i][pit1.j] == '.' and lines[pit2.i][pit2.j] == '.' and lines[pit3.i][pit3.j] == '.' and
-        dist_quadr(pit1, pit2) >= sett->quadr_dist_between_pits and dist_quadr(pit1, pit3) >= sett->quadr_dist_between_pits and dist_quadr(pit2, pit3) >= sett->quadr_dist_between_pits and
-        dist_quadr(pit1, elem->u_mouth) > 1 and dist_quadr(elem->u_mouth, pit3) > 1 and dist_quadr(pit2, elem->u_mouth) > 1 and
-        dist_quadr(pit1, elem->medbat) > 1 and dist_quadr(elem->medbat, pit3) > 1 and dist_quadr(pit2, elem->medbat) > 1));// and
+    } while (not (lines[elem->pit1.i][elem->pit1.j] == '.' and lines[elem->pit2.i][elem->pit2.j] == '.' and lines[elem->pit3.i][elem->pit3.j] == '.' and
+        dist_quadr(elem->pit1, elem->pit2) >= sett->quadr_dist_between_pits and dist_quadr(elem->pit1, elem->pit3) >= sett->quadr_dist_between_pits and dist_quadr(elem->pit2, elem->pit3) >= sett->quadr_dist_between_pits and
+        dist_quadr(elem->pit1, elem->u_mouth) > 1 and dist_quadr(elem->u_mouth, elem->pit3) > 1 and dist_quadr(elem->pit2, elem->u_mouth) > 1 and
+        dist_quadr(elem->pit1, elem->medbat) > 1 and dist_quadr(elem->medbat, elem->pit3) > 1 and dist_quadr(elem->pit2, elem->medbat) > 1));// and
     //number_of_land_complitely(lines) < 100
-    lines[pit1.i][pit1.j] = '1';
-    lines[pit2.i][pit2.j] = '2';
-    lines[pit3.i][pit3.j] = '3';
+    lines[elem->pit1.i][elem->pit1.j] = '1';
+    lines[elem->pit2.i][elem->pit2.j] = '2';
+    lines[elem->pit3.i][elem->pit3.j] = '3';
 
 }
 
@@ -598,8 +593,8 @@ bool create_river_complitely(char** lines, elements* elem, settings* sett, techn
     for (int k = 0; k < sett->number_of_river; k++)
     {
         lines[paths[min_path_index].river[k].i][paths[min_path_index].river[k].j] = 'r';
-        complete_river[k].i = paths[min_path_index].river[k].i;
-        complete_river[k].j = paths[min_path_index].river[k].j;
+        elem->complete_river[k].i = paths[min_path_index].river[k].i;
+        elem->complete_river[k].j = paths[min_path_index].river[k].j;
     }
     lines[elem->u_mouth.i][elem->u_mouth.j] = 'u';
 
@@ -773,7 +768,7 @@ char** create_labirint(elements* elem, settings* sett, technical* tech)
         create_ars_and_med(lines, tech, elem); // теперь нужно добавить арсенал и медсанбат на расстоянии^2 не менее 17
         create_pits(lines, sett, tech, elem); //  Теперь нужно сделать ямы по такому же принципу
         tech->sucsess_river = create_river_complitely(lines, elem, sett, tech); // Теперь сделаем реку - порядка 22 последовательных клеток
-        tech->sucsess_bum = create_bum(lines, tech);
+        tech->sucsess_bum = create_bum(lines, tech, elem);
         tech->sucsess_add_swamp = create_add_swamp(lines, sett, tech);
 
     } while (not(tech->sucsess_river == 1 and number_of_land_complitely(lines, tech) < 10));
@@ -1258,12 +1253,12 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
         (*time_in_swamp) = 0;
         for (int k = 0; k < sett->number_of_river; k++)
         {
-            if ((*pl).coord.i == complete_river[k].i and (*pl).coord.j == complete_river[k].j )
+            if ((*pl).coord.i == elem->complete_river[k].i and (*pl).coord.j == elem->complete_river[k].j )
             {
 
                 if (k - 3 > 0)
                 {
-                    (*pl).coord = complete_river[k - 3];
+                    (*pl).coord = elem->complete_river[k - 3];
                     cout << "Река понесла" << endl;
                     return 1;
                     break;
@@ -1325,21 +1320,21 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
     if (lines[(*pl).coord.i][(*pl).coord.j] == '1')
     {
         (*time_in_swamp) = 0;
-        (*pl).coord = pit2;
+        (*pl).coord = elem->pit2;
         cout << "Попал в яму" << endl;
         return 1;
     }
     if (lines[(*pl).coord.i][(*pl).coord.j] == '2')
     {
         (*time_in_swamp) = 0;
-        (*pl).coord = pit3;
+        (*pl).coord = elem->pit3;
         cout << "Попал в яму" << endl;
         return 1;
     }
     if (lines[(*pl).coord.i][(*pl).coord.j] == '3')
     {
         (*time_in_swamp) = 0;
-        (*pl).coord = pit1;
+        (*pl).coord = elem->pit1;
         cout << "Попал в яму" << endl;
         return 1;
     }
@@ -1522,6 +1517,6 @@ int main()
     delete[] river;
     delete[] arr_of_land_points;
     delete[] paths;
-    delete[] complete_river;
+    delete[] elem.complete_river;
 
 }
