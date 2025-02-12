@@ -44,61 +44,77 @@ bool operator != (point a, point b) { return not(a.i == b.i and a.j == b.j); }
 
 
 
-static bool show_mase = 0;
-static int turns_1 = 0;
-static int turns_2 = 0;
-static int time_in_swamp_1 = 0;
-static int time_in_swamp_2 = 0;
-static int k_along_bord = 1;
-static int k_r_around = 2;
-static int k_touch_walls = -4;
-static int quadr_dist_between_pits = 7;
-static int add_swamp_max = 4;
-static int add_swamp_min = 1;
-static unsigned seed = time(0);
-static int number_of_river = 22;
-static bool sucsess_river = 0;
-static bool sucsess_bum = 0;
-static bool sucsess_add_swamp = 0;
-static int trash = 0;
-static int count_of_land = 0;
-static string command;
-static string action;
 
-static point* complete_river = new point[30];
-static point medbat;
-static point arsenal;
-static point u_mouth;
+
+static point* complete_river = new point[64];
+
 static point pit1, pit2, pit3, bum1, bum2, bum3;
 
-struct elements
+class elements
 {
+public:
     point center_of_swamp;
     point treasure;
+    point medbat;
+    point arsenal;
+    point u_mouth;
 };
-struct settings
+class settings
 {
-    bool respawn_new_place = 0;
+public:
+    bool respawn_new_place;
+    int k_along_bord;
+    int k_r_around;
+    int k_touch_walls;
+    int quadr_dist_between_pits;
+    int add_swamp_max;
+    int add_swamp_min;
+    int number_of_river;
+    settings()
+    {
+        respawn_new_place = 0;
+        k_along_bord = 1;
+        k_r_around = 2;
+        k_touch_walls = -4;
+        quadr_dist_between_pits = 7;
+        add_swamp_max = 4;
+        add_swamp_min = 1;
+        number_of_river = 22;
+    }
+    
 };
-struct technical
+class technical
 {
+public:
+    time_t seed = time(0);
+    int time_in_swamp_1 = 0;
+    int time_in_swamp_2 = 0;
+    bool show_mase = 0;
     bool command_changed = 0;
     bool treasure_picked = 0;
+    int turns_1 = 0;
+    int turns_2 = 0;
+    bool sucsess_river = 0;
+    bool sucsess_bum = 0;
+    bool sucsess_add_swamp = 0;
+    int count_of_land = 0;
+    string command;
+    string action;
 };
 
 
 static point* arr_of_land_points = new point[64];
 static char** lines;
 static river_path* paths = new river_path[2000000];
-static point* river = new point[number_of_river + 1];
+static point* river = new point[64];
 static int count_of_path = 0;
 static long tries = 0;
 static long min_path_index = 0;
 
-int rand_from_a_to_b(int a, int b)
+int rand_from_a_to_b(int a, int b, technical* tech)
 {
-    seed = (seed * 73129 + 95121) % 10000;
-    srand(seed);
+    tech->seed = (tech->seed * 73129 + 95121) % 10000;
+    srand(tech->seed);
     return rand() % (b - a + 1) + a;
 }
 
@@ -119,7 +135,7 @@ player init_player(int id)
     return pl;
 }
 
-crocodile init_croc(char** lines)
+crocodile init_croc(char** lines, technical* tech)
 {
     int count_of_swamp = 0;
     crocodile croc;
@@ -136,7 +152,7 @@ crocodile init_croc(char** lines)
             }
         }
     }
-    croc.coord = swamp_points[rand_from_a_to_b(0, count_of_swamp - 1)];
+    croc.coord = swamp_points[rand_from_a_to_b(0, count_of_swamp - 1, tech)];
     croc.alive = 1;
     croc.time_to_res = 0;
 
@@ -201,25 +217,25 @@ bool is_point_in_arr(point* arr, point p, int sise)
     }
     return 0;
 }
-bool is_there_path(char** lines, point u_mouth)
+bool is_there_path(char** lines, elements* elem)
 {
     bool trig = 0;
 
-    if (u_mouth.j + 1 <= 8)
+    if (elem->u_mouth.j + 1 <= 8)
     {
-        if (lines[u_mouth.i][u_mouth.j + 1] == '.') trig = 1;
+        if (lines[elem->u_mouth.i][elem->u_mouth.j + 1] == '.') trig = 1;
     }
-    if (u_mouth.j - 1 >= 1)
+    if (elem->u_mouth.j - 1 >= 1)
     {
-        if (lines[u_mouth.i][u_mouth.j - 1] == '.') trig = 1;
+        if (lines[elem->u_mouth.i][elem->u_mouth.j - 1] == '.') trig = 1;
     }
-    if (u_mouth.i + 1 <= 8)
+    if (elem->u_mouth.i + 1 <= 8)
     {
-        if (lines[u_mouth.i + 1][u_mouth.j] == '.') trig = 1;
+        if (lines[elem->u_mouth.i + 1][elem->u_mouth.j] == '.') trig = 1;
     }
-    if (u_mouth.i - 1 >= 1)
+    if (elem->u_mouth.i - 1 >= 1)
     {
-        if (lines[u_mouth.i - 1][u_mouth.j] == '.') trig = 1;
+        if (lines[elem->u_mouth.i - 1][elem->u_mouth.j] == '.') trig = 1;
     }
     return trig;
 }
@@ -291,8 +307,9 @@ int dist_quadr(point a, point b)
     return (b.i - a.i) * (b.i - a.i) + (b.j - a.j) * (b.j - a.j);
 }
 
-int number_of_land(char** lines, point* arr_of_p, int count_of_t)
+int number_of_land(char** lines, point* arr_of_p, int count_of_t, technical* tech)
 {
+    int trash = 0;
     int count_of_possible;
     //int next_point_index;
 
@@ -350,19 +367,20 @@ int number_of_land(char** lines, point* arr_of_p, int count_of_t)
         // visual_lab(lines); чтобы видеть как проверяется суша
         if (not is_point_in_arr(arr_of_land_points, possible_points[next_point_index], 64))
         {
-            count_of_land += 1;
-            arr_of_land_points[count_of_land - 1] = possible_points[next_point_index];
+            tech->count_of_land += 1;
+            arr_of_land_points[tech->count_of_land - 1] = possible_points[next_point_index];
         }
         arr_of_p[count_of_t] = possible_points[next_point_index];
-        trash = number_of_land(lines, arr_of_p, count_of_t + 1);
+        trash = number_of_land(lines, arr_of_p, count_of_t + 1, tech);
         lines[possible_points[next_point_index].i][possible_points[next_point_index].j] = '.';
     }
     delete[] possible_points;
     return 0;
 
 }
-int number_of_land_complitely(char** lines)
+int number_of_land_complitely(char** lines, technical* tech)
 {
+    int trash = 0;
     int maxx = 0;
     for (int i = 1; i < 9; i++)
     {
@@ -376,31 +394,32 @@ int number_of_land_complitely(char** lines)
                 p.i = i;
                 p.j = j;
                 arr_of_p[0] = p;
-                count_of_land = 0;
+                tech->count_of_land = 0;
                 for (int k = 0; k < 64; k++)
                 {
                     arr_of_land_points[k].i = -1;
                     arr_of_land_points[k].j = -1;
                 }
-                trash = number_of_land(lines, arr_of_p, count_of_t);
+                trash = number_of_land(lines, arr_of_p, count_of_t, tech);
                 delete[] arr_of_p;
-                if (count_of_land > maxx) maxx = count_of_land;
+                if (tech->count_of_land > maxx) maxx = tech->count_of_land;
             }
         }
     }
     return maxx;
 }
 
-bool create_river(char** lines, point* river, int count_of_river) // создание массива со всеми возможными путями и их характеристиками
+bool create_river(char** lines, point* river, int count_of_river, settings* sett) // создание массива со всеми возможными путями и их характеристиками
 {
+    int trash = 0;
 
-    if (count_of_river == number_of_river) // условие того, что река завершена и завершена на границе лабиринта (опционально)
+    if (count_of_river == sett->number_of_river) // условие того, что река завершена и завершена на границе лабиринта (опционально)
     {
         // if(number_of_land_complitely(lines) < 20) - как выяснилось тогда тратиться овердохера времени и памяти (7Гб и минут 5 ожидания)
-        if (is_along_border(lines, river[number_of_river - 1]) != 0)
+        if (is_along_border(lines, river[sett->number_of_river - 1]) != 0)
         {
             count_of_path += 1;
-            paths[count_of_path - 1].river = new point[number_of_river];
+            paths[count_of_path - 1].river = new point[sett->number_of_river];
             //visual_lab(lines);
             paths[count_of_path - 1].count_of_r_around_summ = 0;
             paths[count_of_path - 1].count_river_along_bord = 0;
@@ -408,7 +427,7 @@ bool create_river(char** lines, point* river, int count_of_river) // создание ма
             paths[count_of_path - 1].toched_walls = new int[20];
             for (int i = 0; i < 5; i++) paths[count_of_path - 1].toched_walls[i] = 0;
 
-            for (int k = 0; k < number_of_river; k++)
+            for (int k = 0; k < sett->number_of_river; k++)
             {
                 paths[count_of_path - 1].river[k] = river[k];
                 paths[count_of_path - 1].count_of_r_around_summ += count_of_r_around(lines, paths[count_of_path - 1].river[k]);
@@ -484,7 +503,7 @@ bool create_river(char** lines, point* river, int count_of_river) // создание ма
         lines[possible_points[next_river_point_index].i][possible_points[next_river_point_index].j] = 'r';
         // visual_lab(lines); чтобы видеть как строится река
         river[count_of_river] = possible_points[next_river_point_index];
-        trash = create_river(lines, river, count_of_river + 1);
+        trash = create_river(lines, river, count_of_river + 1, sett);
         lines[possible_points[next_river_point_index].i][possible_points[next_river_point_index].j] = '.';
     }
     delete[] possible_points;
@@ -492,7 +511,7 @@ bool create_river(char** lines, point* river, int count_of_river) // создание ма
 
 }
 
-bool create_bum(char** lines)
+bool create_bum(char** lines, technical* tech)
 {
     point* possible = new point[64];
     int count_poss = 0;
@@ -520,10 +539,10 @@ bool create_bum(char** lines)
             lines[bum2.i][bum2.j] = '.';
             //lines[bum3.i][bum3.j] = '.';
         }
-        bum1 = possible[rand_from_a_to_b(0, count_poss - 1)];
-        bum2 = possible[rand_from_a_to_b(0, count_poss - 1)];
+        bum1 = possible[rand_from_a_to_b(0, count_poss - 1, tech)];
+        bum2 = possible[rand_from_a_to_b(0, count_poss - 1, tech)];
         //bum3 = possible[rand_from_a_to_b(0,count_poss-1)];
-        while (bum2.i == bum1.i and bum2.j == bum1.j) bum2 = possible[rand_from_a_to_b(0, count_poss - 1)]; // выбираю точку так, чтобы оба бума не попали в одну
+        while (bum2.i == bum1.i and bum2.j == bum1.j) bum2 = possible[rand_from_a_to_b(0, count_poss - 1, tech)]; // выбираю точку так, чтобы оба бума не попали в одну
         //while((bum3.i == bum1.i and bum3.j == bum1.j) or (bum3.i == bum2.i and bum3.j == bum2.j)) bum3 = possible[rand_from_a_to_b(0,count_poss-1)]; // аналогично
         lines[bum1.i][bum1.j] = 'b';
         lines[bum2.i][bum2.j] = 'b';
@@ -534,23 +553,23 @@ bool create_bum(char** lines)
     delete[] possible;
     return 1;
 }
-void create_pits(char** lines)
+void create_pits(char** lines, settings* sett, technical* tech, elements* elem)
 {
     do
     {
-        pit1.i = rand_from_a_to_b(1, 8);
-        pit1.j = rand_from_a_to_b(1, 8);
+        pit1.i = rand_from_a_to_b(1, 8, tech);
+        pit1.j = rand_from_a_to_b(1, 8, tech);
 
-        pit2.i = rand_from_a_to_b(1, 8);
-        pit2.j = rand_from_a_to_b(1, 8);
+        pit2.i = rand_from_a_to_b(1, 8, tech);
+        pit2.j = rand_from_a_to_b(1, 8, tech);
 
-        pit3.i = rand_from_a_to_b(1, 8);
-        pit3.j = rand_from_a_to_b(1, 8);
+        pit3.i = rand_from_a_to_b(1, 8, tech);
+        pit3.j = rand_from_a_to_b(1, 8, tech);
         //
     } while (not (lines[pit1.i][pit1.j] == '.' and lines[pit2.i][pit2.j] == '.' and lines[pit3.i][pit3.j] == '.' and
-        dist_quadr(pit1, pit2) >= quadr_dist_between_pits and dist_quadr(pit1, pit3) >= quadr_dist_between_pits and dist_quadr(pit2, pit3) >= quadr_dist_between_pits and
-        dist_quadr(pit1, u_mouth) > 1 and dist_quadr(u_mouth, pit3) > 1 and dist_quadr(pit2, u_mouth) > 1 and
-        dist_quadr(pit1, medbat) > 1 and dist_quadr(medbat, pit3) > 1 and dist_quadr(pit2, medbat) > 1));// and
+        dist_quadr(pit1, pit2) >= sett->quadr_dist_between_pits and dist_quadr(pit1, pit3) >= sett->quadr_dist_between_pits and dist_quadr(pit2, pit3) >= sett->quadr_dist_between_pits and
+        dist_quadr(pit1, elem->u_mouth) > 1 and dist_quadr(elem->u_mouth, pit3) > 1 and dist_quadr(pit2, elem->u_mouth) > 1 and
+        dist_quadr(pit1, elem->medbat) > 1 and dist_quadr(elem->medbat, pit3) > 1 and dist_quadr(pit2, elem->medbat) > 1));// and
     //number_of_land_complitely(lines) < 100
     lines[pit1.i][pit1.j] = '1';
     lines[pit2.i][pit2.j] = '2';
@@ -558,54 +577,54 @@ void create_pits(char** lines)
 
 }
 
-bool create_river_complitely(char** lines, point u_mouth)
+bool create_river_complitely(char** lines, elements* elem, settings* sett, technical* tech)
 {
-    river[0] = u_mouth;
+    river[0] = elem->u_mouth;
     count_of_path = 0;
-    sucsess_river = create_river(lines, river, 1);
+    tech->sucsess_river = create_river(lines, river, 1, sett);
     if (count_of_path == 0) return 0;
     long minn = 10000000;
     min_path_index = 0;
 
     for (int k = 0; k < count_of_path; k++)
     {
-        if (k_r_around * paths[k].count_of_r_around_summ + k_along_bord * paths[k].count_river_along_bord + k_touch_walls * paths[k].numb_toched_walls < minn)
+        if (sett->k_r_around * paths[k].count_of_r_around_summ + sett->k_along_bord * paths[k].count_river_along_bord + sett->k_touch_walls * paths[k].numb_toched_walls < minn)
         {
-            minn = k_r_around * paths[k].count_of_r_around_summ + k_along_bord * paths[k].count_river_along_bord + k_touch_walls * paths[k].numb_toched_walls;
+            minn = sett->k_r_around * paths[k].count_of_r_around_summ + sett->k_along_bord * paths[k].count_river_along_bord + sett->k_touch_walls * paths[k].numb_toched_walls;
             min_path_index = k;
         }
     }
 
-    for (int k = 0; k < number_of_river; k++)
+    for (int k = 0; k < sett->number_of_river; k++)
     {
         lines[paths[min_path_index].river[k].i][paths[min_path_index].river[k].j] = 'r';
         complete_river[k].i = paths[min_path_index].river[k].i;
         complete_river[k].j = paths[min_path_index].river[k].j;
     }
-    lines[u_mouth.i][u_mouth.j] = 'u';
+    lines[elem->u_mouth.i][elem->u_mouth.j] = 'u';
 
     return 1;
 }
-void create_ars_and_med(char** lines)
+void create_ars_and_med(char** lines, technical* tech, elements* elem)
 {
     do
     {
-        arsenal.i = rand_from_a_to_b(1, 8);
-        arsenal.j = rand_from_a_to_b(1, 8);
+        elem->arsenal.i = rand_from_a_to_b(1, 8, tech);
+        elem->arsenal.j = rand_from_a_to_b(1, 8, tech);
 
-        medbat.i = rand_from_a_to_b(2, 7);
-        medbat.j = rand_from_a_to_b(2, 7);
+        elem->medbat.i = rand_from_a_to_b(2, 7, tech);
+        elem->medbat.j = rand_from_a_to_b(2, 7, tech);
 
-    } while (not (lines[arsenal.i][arsenal.j] == '.' and lines[medbat.i][medbat.j] == '.' and
-        dist_quadr(medbat, arsenal) >= 9 and dist_quadr(medbat, u_mouth) >= 9 and dist_quadr(u_mouth, arsenal) >= 9));
+    } while (not (lines[elem->arsenal.i][elem->arsenal.j] == '.' and lines[elem->medbat.i][elem->medbat.j] == '.' and
+        dist_quadr(elem->medbat, elem->arsenal) >= 9 and dist_quadr(elem->medbat, elem->u_mouth) >= 9 and dist_quadr(elem->u_mouth, elem->arsenal) >= 9));
 
-    lines[arsenal.i][arsenal.j] = 'A';
-    lines[medbat.i][medbat.j] = 'M';
+    lines[elem->arsenal.i][elem->arsenal.j] = 'A';
+    lines[elem->medbat.i][elem->medbat.j] = 'M';
 }
-void create_u_mouth_and_swamp(char** lines, elements* elem)
+void create_u_mouth_and_swamp(char** lines, elements* elem, technical* tech)
 {
-    (*elem).center_of_swamp.i = rand_from_a_to_b(3, 6);
-    (*elem).center_of_swamp.j = rand_from_a_to_b(3, 6); // рандомно определили центр болота
+    (*elem).center_of_swamp.i = rand_from_a_to_b(3, 6, tech);
+    (*elem).center_of_swamp.j = rand_from_a_to_b(3, 6, tech); // рандомно определили центр болота
     for (int n = -1; n <= 1; n++)
     {
         for (int m = -1; m <= 1; m++)
@@ -613,18 +632,18 @@ void create_u_mouth_and_swamp(char** lines, elements* elem)
             lines[(*elem).center_of_swamp.i + n][(*elem).center_of_swamp.j + m] = 's';
         }
     }
-    u_mouth.i = rand_from_a_to_b((*elem).center_of_swamp.i - 1, (*elem).center_of_swamp.i + 1);
-    u_mouth.j = rand_from_a_to_b((*elem).center_of_swamp.j - 1, (*elem).center_of_swamp.j + 1);
-    while ((u_mouth.i == (*elem).center_of_swamp.i and u_mouth.j == (*elem).center_of_swamp.j) or not (is_there_path(lines, u_mouth)))
+    elem->u_mouth.i = rand_from_a_to_b((*elem).center_of_swamp.i - 1, (*elem).center_of_swamp.i + 1, tech);
+    elem->u_mouth.j = rand_from_a_to_b((*elem).center_of_swamp.j - 1, (*elem).center_of_swamp.j + 1, tech);
+    while ((elem->u_mouth.i == (*elem).center_of_swamp.i and elem->u_mouth.j == (*elem).center_of_swamp.j) or not (is_there_path(lines, elem)))
     {
-        u_mouth.i = rand_from_a_to_b((*elem).center_of_swamp.i - 1, (*elem).center_of_swamp.i + 1);
-        u_mouth.j = rand_from_a_to_b((*elem).center_of_swamp.j - 1, (*elem).center_of_swamp.j + 1);
+        elem->u_mouth.i = rand_from_a_to_b((*elem).center_of_swamp.i - 1, (*elem).center_of_swamp.i + 1, tech);
+        elem->u_mouth.j = rand_from_a_to_b((*elem).center_of_swamp.j - 1, (*elem).center_of_swamp.j + 1, tech);
     }
-    lines[u_mouth.i][u_mouth.j] = 'u';
+    lines[elem->u_mouth.i][elem->u_mouth.j] = 'u';
 }
-bool create_add_swamp(char** lines)
+bool create_add_swamp(char** lines, settings* sett, technical* tech)
 {
-    int number_of_add_swamp = rand_from_a_to_b(add_swamp_min, add_swamp_max);
+    int number_of_add_swamp = rand_from_a_to_b(sett->add_swamp_min, sett->add_swamp_max, tech);
     point* possible = new point[20];
     point* added_swamp = new point[20];
     int count_of_added = 0;
@@ -648,7 +667,7 @@ bool create_add_swamp(char** lines)
     if (number_of_add_swamp + 1 >= count_of_possible_swamp) number_of_add_swamp = count_of_possible_swamp - 1;
     for (int k = 0; k < number_of_add_swamp; k++)
     {
-        point s = possible[rand_from_a_to_b(0, count_of_possible_swamp - 1)];
+        point s = possible[rand_from_a_to_b(0, count_of_possible_swamp - 1, tech)];
         if (not is_point_in_arr(added_swamp, s, count_of_added)) // утечки нет
         { //
             count_of_added += 1; //
@@ -674,7 +693,7 @@ void create_land(char** lines)
 }
 
 
-point create_treasure(char** lines)
+point create_treasure(char** lines, technical* tech)
 {
     point treas;
     int count_of_possible = 0;
@@ -692,12 +711,12 @@ point create_treasure(char** lines)
 
         }
     }
-    int index = rand_from_a_to_b(0, count_of_possible - 1);
+    int index = rand_from_a_to_b(0, count_of_possible - 1, tech);
     treas = possible[index];
     delete[] possible;
     return treas;
 }
-void death(char** lines, player* player, technical* tech)
+void death(char** lines, player* player, technical* tech, elements* elem)
 {
     (*player).hp = 2;
 
@@ -710,28 +729,28 @@ void death(char** lines, player* player, technical* tech)
         (*player).with_treasure = 0;
         if (lines[(*player).coord.i][(*player).coord.j] == 's' or lines[(*player).coord.i][(*player).coord.j] == 'u')
         {
-            create_treasure(lines);
+            create_treasure(lines, tech);
             cout << "Крокодил съел клад месте с " << (*player).name << " и высрал его в другом месте" << endl;
         }
     }
-    (*player).coord = medbat;
+    (*player).coord = elem->medbat;
     cout << (*player).name << " умер и появился в медсанбате" << endl;
 }
 
-void create_exit(char** lines)
+void create_exit(char** lines, technical* tech)
 {
     int y_left, y_right, x_up, x_down;
-    y_left = rand_from_a_to_b(1, 8);
-    y_right = rand_from_a_to_b(1, 8);
-    x_up = rand_from_a_to_b(1, 8);
-    x_down = rand_from_a_to_b(1, 8);
+    y_left = rand_from_a_to_b(1, 8, tech);
+    y_right = rand_from_a_to_b(1, 8, tech);
+    x_up = rand_from_a_to_b(1, 8, tech);
+    x_down = rand_from_a_to_b(1, 8, tech);
     lines[y_left][0] = 'E';
     lines[y_right][9] = 'E';
     lines[0][x_up] = 'E';
     lines[9][x_down] = 'E';
 
 }
-char** create_labirint(elements* elem)
+char** create_labirint(elements* elem, settings* sett, technical* tech)
 {
     tries = 0;
     do
@@ -749,33 +768,33 @@ char** create_labirint(elements* elem)
             }
         }
         lines = init_arr(lines);
-        create_u_mouth_and_swamp(lines, elem); // сделали болото и рандомно определили в нем устье
+        create_u_mouth_and_swamp(lines, elem, tech); // сделали болото и рандомно определили в нем устье
 
-        create_ars_and_med(lines); // теперь нужно добавить арсенал и медсанбат на расстоянии^2 не менее 17
-        create_pits(lines); //  Теперь нужно сделать ямы по такому же принципу
-        sucsess_river = create_river_complitely(lines, u_mouth); // Теперь сделаем реку - порядка 22 последовательных клеток
-        sucsess_bum = create_bum(lines);
-        sucsess_add_swamp = create_add_swamp(lines);
+        create_ars_and_med(lines, tech, elem); // теперь нужно добавить арсенал и медсанбат на расстоянии^2 не менее 17
+        create_pits(lines, sett, tech, elem); //  Теперь нужно сделать ямы по такому же принципу
+        tech->sucsess_river = create_river_complitely(lines, elem, sett, tech); // Теперь сделаем реку - порядка 22 последовательных клеток
+        tech->sucsess_bum = create_bum(lines, tech);
+        tech->sucsess_add_swamp = create_add_swamp(lines, sett, tech);
 
-    } while (not(sucsess_river == 1 and number_of_land_complitely(lines) < 10));
+    } while (not(tech->sucsess_river == 1 and number_of_land_complitely(lines, tech) < 10));
 
-    cout << "number_of_land = " << number_of_land_complitely(lines) << endl;
+    cout << "number_of_land = " << number_of_land_complitely(lines, tech) << endl;
     cout << "min_path_index = " << min_path_index << endl;
 
-    cout << "min_number = " << k_r_around * paths[min_path_index].count_of_r_around_summ << " + " <<
-        k_along_bord * paths[min_path_index].count_river_along_bord << " + " <<
-        k_touch_walls * paths[min_path_index].numb_toched_walls << endl;
+    cout << "min_number = " << sett->k_r_around * paths[min_path_index].count_of_r_around_summ << " + " <<
+        sett->k_along_bord * paths[min_path_index].count_river_along_bord << " + " <<
+        sett->k_touch_walls * paths[min_path_index].numb_toched_walls << endl;
 
-    cout << "paths[min_path_index].river[number_of_river] i and j = " << paths[min_path_index].river[number_of_river - 1].i << " " << paths[min_path_index].river[number_of_river - 1].j << endl;
+    cout << "paths[min_path_index].river[sett->number_of_river] i and j = " << paths[min_path_index].river[sett->number_of_river - 1].i << " " << paths[min_path_index].river[sett->number_of_river - 1].j << endl;
     cout << "count_of_paths = " << count_of_path << endl;
 
 
     create_land(lines);
-    create_exit(lines);
+    create_exit(lines, tech);
     return lines;
 }
 
-bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* croc, technical* tech)
+bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* croc, technical* tech, elements* elem)
 {
     if ((*hunter).bullets == 0)
     {
@@ -794,7 +813,7 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
                                                                         // т.е. если игрок и крокодил на одной клетке, первым получит пулю игрок
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim, tech);
+                if ((*victim).hp == 0) death(lines, victim, tech, elem);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
@@ -821,7 +840,7 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
             if (k == (*victim).coord.i and (*hunter).coord.j == (*victim).coord.j)
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim, tech);
+                if ((*victim).hp == 0) death(lines, victim, tech, elem);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
@@ -847,7 +866,7 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
             if (k == (*victim).coord.j and (*hunter).coord.i == (*victim).coord.i)
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim, tech);
+                if ((*victim).hp == 0) death(lines, victim, tech, elem);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
@@ -873,7 +892,7 @@ bool shoot(char** lines, player* victim, player* hunter, string cmd, crocodile* 
             if (k == (*victim).coord.j and (*hunter).coord.i == (*victim).coord.i)
             {
                 (*victim).hp -= 1;
-                if ((*victim).hp == 0) death(lines, victim, tech);
+                if ((*victim).hp == 0) death(lines, victim, tech, elem);
                 cout << "Попал в игрока" << endl;
                 if ((*victim).hp == 1 and (*victim).with_treasure == 1)
                 {
@@ -986,44 +1005,12 @@ bool explode(char** lines, player* player, string cmd)
     return 1;
 }
 
-bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, player* pl1, player* pl2, technical* tech, elements* elem)
+bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, player* pl1, player* pl2, technical* tech, elements* elem, settings* sett)
 {
     (*tech).command_changed = 0;
-    if (player_in_exit(pl) and turns != 0) // если человек находится "в выходе"
-    {
-        cout << "Игрок " << (*pl).name << " заходит обратно в лабиринт" << endl;
-        if ((*pl).coord.i == 9) command = "Up";
-        if ((*pl).coord.i == 0) command = "Down";
-        if ((*pl).coord.j == 9) command = "Left"; // определяем куда надо шагнуть обратно
-        if ((*pl).coord.j == 0) command = "Right";
-        (*tech).command_changed = 1;
-    }
-    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j // на случай если сокровище заспавнилось прямо под игроком
-        and (*pl).with_treasure == 0 and (*pl).hp == 2)
-    {
-        cout << (*pl).name << " обнаружил под собой клад. Берешь его?" << endl;
-        cin >> action;
-        if (action == "Yes" or action == "y" or action == "Y") (*pl).with_treasure = 1;
-    }
-    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j
-        and (*pl).with_treasure == 0 and (*pl).hp != 2)
-    {
-        cout << (*pl).name << " обнаружил под собой клад но не может его взять т.к. не полное здоровье" << endl;
-    }
 
-    /*if (lines[(*pl).coord.i][(*pl).coord.j] == 'M') // чел стоит в медсанбате - тогда он все время хилится
-    {
-        (*pl).hp = 2;
-        (*time_in_swamp) = 0;
-        cout << "Стоишь в медсанбате - ты полностью здоров" << endl; // хер пойми как, но эта штука вызывает нарушение каких то прав
-    }
-    if (lines[(*pl).coord.i][(*pl).coord.j] == 'A') // чел стоит в Арсенале - тогда у него все время полный боезапас
-    {
-        (*pl).bullets = 3;
-        (*pl).granade = 2;
-        (*time_in_swamp) = 0;
-        cout << "Стоишь в арсенале - у тебя 3 патрона и 2 гранаты" << endl;
-    }*/
+
+    int trash = 0;
     char temp_1;
     char temp_2;
     char temp_3;
@@ -1071,16 +1058,41 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
 
 
         (*pl).coord.i += 1; // чтобы в нулевой ход игрок пришел на клетку, куда захотел высадиться
-        command = "Up";
+        tech->command = "Up";
         (*tech).command_changed = 1;
     }
-    if (not((*tech).command_changed)) cin >> command; // P.s. command это static string обьявленный в самом начале P.s. так было раньше
-    if (command == "Show_maze")
-    {
-        show_mase = 1;
 
-        temp_1 = lines[(*pl1).coord.i][(*pl1).coord.j];
-        temp_2 = lines[(*pl2).coord.i][(*pl2).coord.j];
+    if (player_in_exit(pl) and turns != 0) // если человек находится "в выходе"
+    {
+        cout << "Игрок " << (*pl).name << " заходит обратно в лабиринт" << endl;
+        if ((*pl).coord.i == 9) tech->command = "Up";
+        if ((*pl).coord.i == 0) tech->command = "Down";
+        if ((*pl).coord.j == 9) tech->command = "Left"; // определяем куда надо шагнуть обратно
+        if ((*pl).coord.j == 0) tech->command = "Right";
+        (*tech).command_changed = 1;
+    }
+
+    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j // на случай если сокровище заспавнилось прямо под игроком
+        and (*pl).with_treasure == 0 and (*pl).hp == 2)
+    {
+        cout << (*pl).name << " обнаружил под собой клад. Берешь его?" << endl;
+        cin >> tech->action;
+        if (tech->action == "Yes" or tech->action == "y" or tech->action == "Y") (*pl).with_treasure = 1;
+    }
+    if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j
+        and (*pl).with_treasure == 0 and (*pl).hp != 2)
+    {
+        cout << (*pl).name << " обнаружил под собой клад но не может его взять т.к. не полное здоровье" << endl;
+    }
+
+
+    if (not((*tech).command_changed)) cin >> tech->command; // P.s. tech->command это static string обьявленный в самом начале P.s. так было раньше
+    if (tech->command == "Show_maze")
+    {
+        tech->show_mase = 1;
+
+        temp_1 = lines[pl1->coord.i][(*pl1).coord.j];
+        temp_2 = lines[pl2->coord.i][pl2->coord.j];
         temp_3 = lines[(*elem).treasure.i][(*elem).treasure.j];
         temp_4 = lines[(*croc).coord.i][(*croc).coord.j];
         lines[(*pl1).coord.i][(*pl1).coord.j] = 'O'; // Нанести игрока на карту лабиринта временно (чтобы было видно где он)
@@ -1091,41 +1103,54 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
 
         visual_lab(lines);
         cout << endl;
-        // if(show_mase) visual_lab(lines);                  // Вывести лабиринт
+        // if(tech->show_mase) visual_lab(lines);                  // Вывести лабиринт
         lines[(*pl1).coord.i][(*pl1).coord.j] = temp_1; // Вернуть в точку в лабиринте то что было
         lines[(*pl2).coord.i][(*pl2).coord.j] = temp_2;
         lines[(*elem).treasure.i][(*elem).treasure.j] = temp_3;
         lines[(*croc).coord.i][(*croc).coord.j] = temp_4;
-        cin >> command;
+        cin >> tech->command;
     }
-    if (command == "Hide_maze")
+    if (tech->command == "Hide_maze")
     {
-        show_mase = 0;
-        cin >> command;
+        tech->show_mase = 0;
+        cin >> tech->command;
     }
-    if (command == "Stop" or command == "stop") return 1;
+    if (tech->command == "Stop" or tech->command == "stop") return 1;
 
+    if (lines[(*pl).coord.i][(*pl).coord.j] == 'M') // чел стоит в медсанбате - тогда он все время хилится
+    {
+        (*pl).hp = 2;
+        (*time_in_swamp) = 0;
+        cout << "Стоишь в медсанбате - ты полностью здоров" << endl; // хер пойми как, но эта штука вызывает нарушение каких то прав
+    }
+    if (lines[(*pl).coord.i][(*pl).coord.j] == 'A') // чел стоит в Арсенале - тогда у него все время полный боезапас
+    {
+        (*pl).bullets = 3;
+        (*pl).granade = 2;
+        (*time_in_swamp) = 0;
+        cout << "Стоишь в арсенале - у тебя 3 патрона и 2 гранаты" << endl;
+    }
 
     bool trig = 0;
-    while (not(command == "Up" or command == "Down" or command == "Left" or command == "Right"
-        or command == "Show_maze" or command == "Shoot" or command == "Explode"))
+    while (not(tech->command == "Up" or tech->command == "Down" or tech->command == "Left" or tech->command == "Right"
+        or tech->command == "Show_maze" or tech->command == "Shoot" or tech->command == "Explode"))
     {
         cout << "Херню какую то ввел, давай нормальную команду 819 строка";
-        cin >> command;
+        cin >> tech->command;
     }
-    if (command == "Up") (*pl).coord.i -= 1;
+    if (tech->command == "Up") (*pl).coord.i -= 1;
 
-    if (command == "Down") (*pl).coord.i += 1;
+    if (tech->command == "Down") (*pl).coord.i += 1;
 
-    if (command == "Right") (*pl).coord.j += 1;
+    if (tech->command == "Right") (*pl).coord.j += 1;
 
-    if (command == "Left") (*pl).coord.j -= 1;
+    if (tech->command == "Left") (*pl).coord.j -= 1;
 
     if ((*pl).coord.i == (*elem).treasure.i and (*pl).coord.j == (*elem).treasure.j and (*tech).treasure_picked != 1 and (*pl).hp == 2) // если нашел клад
     {
         cout << (*pl).name << " нашел клад. Берешь его?" << endl;
-        cin >> action;
-        if (action == "Yes" or action == "y" or action == "Y")
+        cin >> tech->action;
+        if (tech->action == "Yes" or tech->action == "y" or tech->action == "Y")
         {
             (*pl).with_treasure = 1;
             (*tech).treasure_picked = 1;
@@ -1142,13 +1167,13 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
         (*elem).treasure.i = (*pl).coord.i;
         (*elem).treasure.j = (*pl).coord.j;
     }
-    if (command == "Shoot")
+    if (tech->command == "Shoot")
     {
         cout << "Куда стреляешь?" << endl;
-        cin >> command;
+        cin >> tech->command;
         if (id == 10) // Тогда охотник - первый игрок (И сейчас ход 1 игрока)
         {
-            trash = shoot(lines, &(*pl2), pl, command, croc, tech);
+            trash = shoot(lines, &(*pl2), pl, tech->command, croc, tech, elem);
             if ( (lines[(*pl).coord.i][(*pl).coord.j] == 's' or 
                   lines[(*pl).coord.i][(*pl).coord.j] == 'u')
                   and (*croc).alive)
@@ -1159,7 +1184,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
                 {
                     cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                     (*time_in_swamp) = 0;
-                    death(lines, pl, tech);
+                    death(lines, pl, tech, elem);
                     return 1;
                 }
             }
@@ -1168,7 +1193,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
         }
         if (id == 20) // Тогда охотник - второй игрок (И сейчас ход 2 игрока)
         {
-            trash = shoot(lines, &(*pl1), pl, command, croc, tech);
+            trash = shoot(lines, &(*pl1), pl, tech->command, croc, tech, elem);
             if ((lines[(*pl).coord.i][(*pl).coord.j] == 's' or
                 lines[(*pl).coord.i][(*pl).coord.j] == 'u')
                 and (*croc).alive)
@@ -1179,7 +1204,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
                 {
                     cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                     (*time_in_swamp) = 0;
-                    death(lines, pl, tech);
+                    death(lines, pl, tech, elem);
                     return 1;
                 }
             }
@@ -1187,11 +1212,11 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             return 1;
         }
     }
-    if (command == "Explode")
+    if (tech->command == "Explode")
     {
         cout << "Куда бросаешь гранату?" << endl;
-        cin >> action;
-        explode(lines, pl, action);
+        cin >> tech->action;
+        explode(lines, pl, tech->action);
         if ((lines[(*pl).coord.i][(*pl).coord.j] == 's' or
             lines[(*pl).coord.i][(*pl).coord.j] == 'u')
             and (*croc).alive)
@@ -1202,7 +1227,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             {
                 cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                 (*time_in_swamp) = 0;
-                death(lines, pl, tech);
+                death(lines, pl, tech, elem);
                 return 1;
             }
         }
@@ -1231,7 +1256,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
     if (lines[(*pl).coord.i][(*pl).coord.j] == 'r')
     {
         (*time_in_swamp) = 0;
-        for (int k = 0; k < number_of_river; k++)
+        for (int k = 0; k < sett->number_of_river; k++)
         {
             if ((*pl).coord.i == complete_river[k].i and (*pl).coord.j == complete_river[k].j )
             {
@@ -1245,7 +1270,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
                 }
                 else
                 {
-                    (*pl).coord = u_mouth;
+                    (*pl).coord = elem->u_mouth;
                     cout << "Река в устье принесла" << endl;
                     (*time_in_swamp) += 1;
                     cout << "Болото рычит " << (*time_in_swamp) << " раз";
@@ -1273,7 +1298,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             if ((*time_in_swamp) == 3)
             {
                 cout << "Покусан крокодилом, отправился в медсанбат" << endl;
-                death(lines, pl, tech);
+                death(lines, pl, tech, elem);
                 (*time_in_swamp) = 0;
                 return 1;
             }
@@ -1327,7 +1352,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             if ((*time_in_swamp) == 3)
             {
                 cout << "Покусан крокодилом, отправился в медсанбат" << endl;
-                death(lines, pl, tech);
+                death(lines, pl, tech, elem);
                 (*time_in_swamp) = 0;
                 return 1;
             }
@@ -1344,10 +1369,10 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
     {
         cout << "Бум" << endl;
 
-        if (command == "Up") (*pl).coord.i += 1;
-        if (command == "Down") (*pl).coord.i -= 1;
-        if (command == "Right") (*pl).coord.j -= 1;
-        if (command == "Left") (*pl).coord.j += 1;
+        if (tech->command == "Up") (*pl).coord.i += 1;
+        if (tech->command == "Down") (*pl).coord.i -= 1;
+        if (tech->command == "Right") (*pl).coord.j -= 1;
+        if (tech->command == "Left") (*pl).coord.j += 1;
 
         if ((*pl).with_treasure)
         {
@@ -1363,7 +1388,7 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
             {
                 cout << "Покусан крокодилом, отправился в медсанбат" << endl;
                 (*time_in_swamp) = 0;
-                death(lines, pl, tech);
+                death(lines, pl, tech, elem);
                 return 1;
             }
 
@@ -1395,17 +1420,20 @@ bool step(player* pl, int turns, int* time_in_swamp, int id, crocodile* croc, pl
 
 int main()
 {
-    elements elem;
     settings sett;
+    elements elem;
+    
     technical tech;
     char temp_1;
     char temp_2;
     char temp_3;
-    action = "";
+    int trash = 0;
+    
+    tech.action = "";
     setlocale(0, "Russian");
     cout << "Крокодил возрождается на прежнем месте?" << endl;
-    cin >> action;
-    if (action == "Yes" or action == "y" or action == "yes") sett.respawn_new_place = 0; // в будущем часть функции init_settings
+    cin >> tech.action;
+    if (tech.action == "Yes" or tech.action == "y" or tech.action == "yes") sett.respawn_new_place = 0; // в будущем часть функции init_settings
     else sett.respawn_new_place = 1;
 
     player player_1 = init_player(10); // 10 это id
@@ -1418,16 +1446,16 @@ int main()
 
     // Начинаются ходы игроков
     cout << "Показывать лабиринт? Напиши Yes если да, если нет, напиши что угодно" << endl;
-    cin >> command;
-    if (command == "Yes" or command == "yes" or command == "y" or command == "Y") show_mase = 1;
-    cout << "Введите количество рек в лабиринте (до 24)" << endl;
-    cin >> number_of_river;
+    cin >> tech.command;
+    if (tech.command == "Yes" or tech.command == "yes" or tech.command == "y" or tech.command == "Y") tech.show_mase = 1;
+    cout << "Введите количество рек в лабиринте (от 20 до 24)" << endl;
+    cin >> sett.number_of_river;
     do
     {
-        lines = create_labirint(&elem);
-        elem.treasure = create_treasure(lines);
+        lines = create_labirint(&elem, &sett, &tech);
+        elem.treasure = create_treasure(lines, &tech);
         
-        if (show_mase)
+        if (tech.show_mase)
         {
             temp_3 = lines[elem.treasure.i][elem.treasure.j];
             lines[elem.treasure.i][elem.treasure.j] = 't';
@@ -1440,12 +1468,12 @@ int main()
 
     } while (not(key == "Yes" or key == "yes" or key == "y" or key == "yep"));
 
-    crocodile croc = init_croc(lines);
+    crocodile croc = init_croc(lines, &tech);
     
 
     int repets = 0;
 
-    while ( not(command == "Stop" or command == "stop"))
+    while ( not(tech.command == "Stop" or tech.command == "stop"))
     {
         if (not(croc.alive))
         {
@@ -1454,31 +1482,31 @@ int main()
             if (croc.time_to_res == 1) cout << "До появления нового крокодила в болоте остался 1 ход" << endl;
             if (croc.time_to_res == 0)
             {
-                if (sett.respawn_new_place) croc = init_croc(lines); // новый крокодил т.е. случайное место
+                if (sett.respawn_new_place) croc = init_croc(lines, &tech); // новый крокодил т.е. случайное место
                 if ( not(sett.respawn_new_place) ) croc.alive = 1; // крокодил остался на прежнем месте
                 
                 cout << "В болоте завелся новый крокодил" << endl;
             }
         }
         cout << "Ход первого игрока:" << endl;
-        trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc, &player_1, &player_2, &tech, &elem); // Ход 1 игрока
+        trash = step(&player_1, tech.turns_1, &tech.time_in_swamp_1, player_1.id, &croc, &player_1, &player_2, &tech, &elem, &sett); // Ход 1 игрока
         while (trash != 1)
         {
             cout << "Херню какую то ввел, давай нормальную команду" << endl;
-            trash = step(&player_1, turns_1, &time_in_swamp_1, player_1.id, &croc, &player_1, &player_2, &tech, &elem);
+            trash = step(&player_1, tech.turns_1, &tech.time_in_swamp_1, player_1.id, &croc, &player_1, &player_2, &tech, &elem, &sett);
         }
         cout << endl;
         cout << "Ход второго игрока:" << endl;
-        trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc, &player_1, &player_2, &tech, &elem); // Ход 2 игрока
+        trash = step(&player_2, tech.turns_2, &tech.time_in_swamp_2, player_2.id, &croc, &player_1, &player_2, &tech, &elem, &sett); // Ход 2 игрока
         while (trash != 1)
         {
             cout << "Херню какую то ввел, давай нормальную команду" << endl;
-            trash = step(&player_2, turns_2, &time_in_swamp_2, player_2.id, &croc, &player_1, &player_2, &tech, &elem);
+            trash = step(&player_2, tech.turns_2, &tech.time_in_swamp_2, player_2.id, &croc, &player_1, &player_2, &tech, &elem, &sett);
         }
         cout << endl;
 
-        turns_1 += 1;
-        turns_2 += 1;
+        tech.turns_1 += 1;
+        tech.turns_2 += 1;
     }
 
     for (int i = 0; i < 10; i++)
