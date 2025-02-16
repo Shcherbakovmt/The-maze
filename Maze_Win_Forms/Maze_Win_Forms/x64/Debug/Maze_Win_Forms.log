@@ -1,0 +1,12 @@
+﻿  MainForm.cpp
+C:\Users\User\source\repos\The-maze\Maze_Win_Forms\Class_Maze.hpp(117,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  (компиляция исходного файла "MainForm.cpp")
+  
+C:\Users\User\source\repos\The-maze\Maze_Win_Forms\Class_Maze.hpp(442,13): warning C4101: next_river_point_index: неиспользованная локальная переменная
+  (компиляция исходного файла "MainForm.cpp")
+  
+C:\Users\User\source\repos\The-maze\Maze_Win_Forms\Class_Maze.hpp(782,13): error C2561: Maze::shoot: функция должна возвращать значение
+  (компиляция исходного файла "MainForm.cpp")
+      C:\Users\User\source\repos\The-maze\Maze_Win_Forms\Class_Maze.hpp(777,10):
+       см. объявление "Maze::shoot"
+  

@@ -1,0 +1,3 @@
+C:\Users\User\source\repos\The-maze\Maze_Win_Forms\Maze_Win_Forms\x64\Release\Maze_Win_Forms.vcxproj.AssemblyReference.cache
+C:\Users\User\source\repos\The-maze\Maze_Win_Forms\Maze_Win_Forms\x64\Release\MazeWinForms.MainForm.resources
+C:\Users\User\source\repos\The-maze\Maze_Win_Forms\Maze_Win_Forms\x64\Release\Maze_Win_Forms.vcxproj.GenerateResource.cache

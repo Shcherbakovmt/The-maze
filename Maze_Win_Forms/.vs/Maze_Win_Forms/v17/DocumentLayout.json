@@ -1,0 +1,100 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\Class_Maze.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|solutionrelative:Class_Maze.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}|Form",
+      "RelativeMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|solutionrelative:MainForm.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|solutionrelative:MainForm.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{7DBAA362-96AA-4D49-AA3B-3B8B718B66F3}|Maze_Win_Forms.vcxproj|solutionrelative:MainForm.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainForm.h",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.h",
+              "RelativeDocumentMoniker": "MainForm.h",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.h",
+              "RelativeToolTip": "MainForm.h",
+              "ViewState": "AgIAAFkAAAAAAAAAAAD4v24AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-15T21:04:36.781Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MainForm.cpp",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.cpp",
+              "RelativeDocumentMoniker": "MainForm.cpp",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.cpp",
+              "RelativeToolTip": "MainForm.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-02-15T21:04:00.743Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e5c86464-96be-4d7c-9a8b-abcb3bbf5f92}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Class_Maze.hpp",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\Class_Maze.hpp",
+              "RelativeDocumentMoniker": "Class_Maze.hpp",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\Class_Maze.hpp",
+              "RelativeToolTip": "Class_Maze.hpp",
+              "ViewState": "AgIAACkBAAAAAAAAAAAkwA8DAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-16T10:10:21.976Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainForm.h [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.h",
+              "RelativeDocumentMoniker": "MainForm.h",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_Win_Forms\\MainForm.h [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "MainForm.h [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-16T10:09:47.305Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

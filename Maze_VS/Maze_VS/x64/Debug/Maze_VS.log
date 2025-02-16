@@ -1,4 +1,8 @@
 ﻿  main.cpp
-C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(119,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\main.cpp(444,13): warning C4101: next_river_point_index: неиспользованная локальная переменная
+C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\Maze.hpp(117,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  (компиляция исходного файла "main.cpp")
+  
+C:\Users\User\source\repos\The-maze\Maze_VS\Maze_VS\Maze.hpp(442,13): warning C4101: next_river_point_index: неиспользованная локальная переменная
+  (компиляция исходного файла "main.cpp")
+  
   Maze_VS.vcxproj -> C:\Users\User\source\repos\The-maze\Maze_VS\x64\Debug\Maze_VS.exe

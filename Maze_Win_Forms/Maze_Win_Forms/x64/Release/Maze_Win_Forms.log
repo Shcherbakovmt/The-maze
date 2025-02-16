@@ -1,0 +1,3 @@
+﻿  MainForm.obj : обнаружен модуль MSIL; для MSIL последовательная компоновка отключена; выполняется полная компоновка
+LINK : error LNK2001: неразрешенный внешний символ MainForm.cpp.
+C:\Users\User\source\repos\The-maze\Maze_Win_Forms\x64\Release\Maze_Win_Forms.exe : fatal error LNK1120: неразрешенных внешних элементов: 1
