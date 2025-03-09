@@ -1,14 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_VS\\",
+  "WorkspaceRootPath": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\User\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|solutionrelative:Maze_VS\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|C:\\Users\\User\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Maze.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{836EBE98-A9EC-499A-9920-0B40C48A2AFA}|Maze_VS\\Maze_VS.vcxproj|solutionrelative:Maze_VS\\Maze.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\string||{3B902123-F8A7-4915-9F01-361F908088D0}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -35,25 +34,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Maze.hpp",
-              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Maze.hpp",
-              "RelativeDocumentMoniker": "Maze_VS\\Maze.hpp",
-              "ToolTip": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\Maze.hpp",
-              "RelativeToolTip": "Maze_VS\\Maze.hpp",
-              "ViewState": "AgIAAE4CAAAAAAAAAAAAANwCAAAcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-02-16T10:00:18.038Z",
+              "Title": "string",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\string",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\string",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\string",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\include\\string",
+              "ViewState": "AgIAACUBAAAAAAAAAADgv2IAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-03-09T20:22:31.9Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
+              "DocumentMoniker": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
               "RelativeDocumentMoniker": "Maze_VS\\main.cpp",
-              "ToolTip": "C:\\Users\\User\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
+              "ToolTip": "C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\source\\repos\\The-maze\\Maze_VS\\Maze_VS\\main.cpp",
               "RelativeToolTip": "Maze_VS\\main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAACYFAAAAAAAAAADgvywFAABRAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-02-04T08:59:56.878Z",
               "EditorCaption": ""
